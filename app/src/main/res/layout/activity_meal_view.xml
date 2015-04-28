@@ -1,0 +1,86 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    tools:context="com.example.hockeytom1.eatingapp.MealView">
+
+    <TextView android:id="@+id/time_spent_eating"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:text="@string/time_spent_eating"
+        android:textSize="48dp"
+        android:textAlignment="center"
+        android:layout_below="@+id/time_spent_eating_descriptor"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/start_button_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start_stop_button"
+        android:onClick="startStopButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/time_spent_eating"
+        android:layout_alignStart="@+id/time_spent_eating"
+        android:layout_marginBottom="82dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="resetButton"
+        android:id="@+id/reset_button_id"
+        android:text="Reset"
+        android:layout_alignTop="@+id/start_button_id"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Time Spent Eating"
+        android:id="@+id/time_spent_eating_descriptor"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/time_spent_eating"
+        android:layout_alignStart="@+id/time_spent_eating"
+        android:layout_alignRight="@+id/time_spent_eating"
+        android:layout_alignEnd="@+id/time_spent_eating"
+        android:textSize="32dp"
+        android:textAlignment="center" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Mouthfuls Per Minute"
+        android:id="@+id/mouthfuls_per_minute_descriptor"
+        android:textSize="24dp"
+        android:layout_below="@+id/time_spent_eating"
+        android:layout_alignLeft="@+id/time_spent_eating"
+        android:layout_alignStart="@+id/time_spent_eating"
+        android:layout_marginTop="41dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/mouthfuls_per_minute"
+        android:id="@+id/mouthfuls_per_minute"
+        android:textSize="48dp"
+        android:layout_below="@+id/mouthfuls_per_minute_descriptor"
+        android:layout_alignLeft="@+id/mouthfuls_per_minute_descriptor"
+        android:layout_alignStart="@+id/mouthfuls_per_minute_descriptor"
+        android:layout_alignRight="@+id/time_spent_eating"
+        android:layout_alignEnd="@+id/time_spent_eating" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:id="@+id/save_button_id"
+        android:layout_alignTop="@+id/reset_button_id"
+        android:layout_alignRight="@+id/mouthfuls_per_minute"
+        android:layout_alignEnd="@+id/mouthfuls_per_minute" />
+
+</RelativeLayout>

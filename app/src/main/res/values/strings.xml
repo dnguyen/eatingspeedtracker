@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Eating App</string>
+    <string name="eat_button">Eat Meal</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_meal_view">Meal View</string>
+    <string name="start_stop_button">%s</string>
+    <string name="time_spent_eating">%s</string>
+    <string name="mouthfuls_per_minute">%s</string>
+    <string name="title_activity_history_view">HistoryView</string>
+
+    <string name="hello_world">Hello world!</string>
+
+</resources>
