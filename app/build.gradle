@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.hockeytom1.eatingapp"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"

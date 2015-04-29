@@ -2,11 +2,18 @@ package com.example.hockeytom1.eatingapp;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.example.hockeytom1.eatingapp.bluetooth.BluetoothConnection;
+import com.example.hockeytom1.eatingapp.bluetooth.SensorCommand;
 
 
 public class MainMenu extends ActionBarActivity {
@@ -15,6 +22,17 @@ public class MainMenu extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
+
+        BluetoothConnection newConnection = new BluetoothConnection("HC-06");
+        newConnection.setCommandProcessedHandler(new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                SensorCommand command = (SensorCommand) msg.obj;
+                Log.d("eatingapp", "Processed: " + command.Command + " " + command.Data + " " + command.Data + " " + command.Time + " (" + command.TimeMS + ")");
+            }
+
+        });
+        newConnection.startReading();
     }
 
 
