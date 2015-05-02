@@ -14,6 +14,7 @@ import android.view.View;
 
 import com.example.hockeytom1.eatingapp.bluetooth.BluetoothConnection;
 import com.example.hockeytom1.eatingapp.bluetooth.SensorCommand;
+import com.example.hockeytom1.eatingapp.storage.DatabaseConnection;
 
 
 public class MainMenu extends ActionBarActivity {
@@ -29,6 +30,11 @@ public class MainMenu extends ActionBarActivity {
             public void handleMessage(Message msg) {
                 SensorCommand command = (SensorCommand) msg.obj;
                 Log.d("eatingapp", "Processed: " + command.Command + " " + command.Data + " " + command.Data + " " + command.Time + " (" + command.TimeMS + ")");
+
+                if (command.Command.equals("a")) {
+                    String[] data = command.Data.split(",");
+                    DatabaseConnection.getInstance().getDatabase().execSQL("INSERT INTO acceleration_log (x, y, z, time) VALUES(" + data[0] + "," + data[1] + "," + data[2] + ");");
+                }
             }
 
         });
