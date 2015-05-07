@@ -11,6 +11,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.hockeytom1.eatingapp.storage.DBAdapter;
+import com.example.hockeytom1.eatingapp.storage.DatabaseConnection;
+
+import java.sql.PreparedStatement;
+
 
 public class MealView extends ActionBarActivity
 {
@@ -71,16 +76,35 @@ public class MealView extends ActionBarActivity
     {
         if(myMealWindow.getIsPaused() == true)
         {
-            myMealWindow.setIsPaused(false);
-            myMealWindow.setStartStopButton("Stop");
-            //myMealWindow.startMeal();
-            //myMealWindow.timeMeal();
+            //myMealWindow.setIsPaused(false);
+            //myMealWindow.setStartStopButton("Stop");
+            myMealWindow.startMeal();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while(!myMealWindow.getIsPaused())
+                    {
+                        myMealWindow.timeMeal();
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Resources res = getResources();
+                                String timeSpentEatingText = res.getString(R.string.time_spent_eating, myMealWindow.getTimeSpentEating());
+                                String mouthfulsPerMinuteText = res.getString(R.string.mouthfuls_per_minute, myMealWindow.getMouthfulsText());
+
+                                timeSpentEating.setText(timeSpentEatingText);
+                                mouthfulsPerMinute.setText(mouthfulsPerMinuteText);
+                            }
+                        });
+                    }
+                }
+            }).start();
         }
         else
         {
-            myMealWindow.setIsPaused(true);
-            myMealWindow.setStartStopButton("Start");
-            //myMealWindow.pauseMeal();
+            myMealWindow.pauseMeal();
         }
         Resources res = getResources();
         String buttonText = res.getString(R.string.start_stop_button, myMealWindow.getStartStopButton());
@@ -91,5 +115,20 @@ public class MealView extends ActionBarActivity
     public void resetButton(View view)
     {
         myMealWindow.resetMeal();
+        Resources res = getResources();
+        String buttonText = res.getString(R.string.start_stop_button, myMealWindow.getStartStopButton());
+        String timeSpentEatingText = res.getString(R.string.time_spent_eating, myMealWindow.getTimeSpentEating());
+        String mouthfulsPerMinuteText = res.getString(R.string.mouthfuls_per_minute, myMealWindow.getMouthfulsText());
+
+        timeSpentEating.setText(timeSpentEatingText);
+        mouthfulsPerMinute.setText(mouthfulsPerMinuteText);
+        startStopButtonText.setText(buttonText);
+    }
+
+    public void saveButton(View view)
+    {
+        myMealWindow.saveMeal();
+
+        DatabaseConnection.getInstance().getDatabase().execSQL("INSERT INTO eating_log(timeSpentEating, mouthfulsPerMinute, time) VALUES('" + myMealWindow.getTimeSpentEating() + "', '" + myMealWindow.getMouthfulsText() + "', '" + myMealWindow.getTimeStamp() +"')");
     }
 }

@@ -24,7 +24,8 @@ public class DatabaseConnection {
     }
 
     private void createTables() {
-        database.execSQL("CREATE TABLE IF NOT EXISTS acceleration_log(id INTEGER PRIMARY KEY AUTOINCREMENT, x REAL, y REAL, z REAL, time DATETIME);");
+        //database.execSQL("CREATE TABLE IF NOT EXISTS acceleration_log(id INTEGER PRIMARY KEY AUTOINCREMENT, x REAL, y REAL, z REAL, time DATETIME);");
+        database.execSQL("CREATE TABLE IF NOT EXISTS eating_log(id INTEGER PRIMARY KEY AUTOINCREMENT, timeSpentEating REAL, mouthfulsPerMinute REAL, time REAL);");
     }
 
     public SQLiteDatabase getDatabase() {

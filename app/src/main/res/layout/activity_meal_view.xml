@@ -78,6 +78,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"
+        android:onClick="saveButton"
         android:id="@+id/save_button_id"
         android:layout_alignTop="@+id/reset_button_id"
         android:layout_alignRight="@+id/mouthfuls_per_minute"

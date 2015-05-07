@@ -1,5 +1,8 @@
 package com.example.hockeytom1.eatingapp;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by hockeytom1 on 4/21/15.
  */
@@ -67,14 +70,14 @@ public class MealWindow
 
         mouthfulsPerMinute = (int)(mouthfuls/(minutes+1));
 
-        timeSpentEating = Integer.toString((int)hours)+":"+Integer.toString((int)minutes)+":"+Integer.toString((int)seconds);
+        timeSpentEating = Integer.toString((int)hours/10)+Integer.toString((int)hours%10)+":"+Integer.toString((int)minutes/10)+Integer.toString((int)minutes%10)+":"+Integer.toString((int)seconds/10)+Integer.toString((int)seconds%10);
         mouthfulsText = Integer.toString(mouthfulsPerMinute);
     }
 
     public void pauseMeal()
     {
         isPaused=true;
-        savedTime = currentTime;
+        savedTime = currentTime*1000;
         startStopButton="Start";
     }
 
@@ -99,6 +102,11 @@ public class MealWindow
         isPaused=true;
     }
 
+    public void saveMeal()
+    {
+        timeStamp = new SimpleDateFormat("MM/dd/yy").format(new Date());
+    }
+
     public String getTimeSpentEating()
     {
         return timeSpentEating;
@@ -107,6 +115,11 @@ public class MealWindow
     public String getMouthfulsText()
     {
         return mouthfulsText;
+    }
+
+    public String getTimeStamp()
+    {
+        return timeStamp;
     }
 
     public String getStartStopButton()

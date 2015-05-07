@@ -23,7 +23,7 @@ public class MainMenu extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-
+/*
         BluetoothConnection newConnection = new BluetoothConnection("HC-06");
         newConnection.setCommandProcessedHandler(new Handler(Looper.getMainLooper()) {
             @Override
@@ -39,6 +39,7 @@ public class MainMenu extends ActionBarActivity {
 
         });
         newConnection.startReading();
+        */
     }
 
 

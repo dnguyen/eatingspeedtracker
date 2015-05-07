@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.hockeytom1.eatingapp" >
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -32,7 +34,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.hockeytom1.eatingapp.MainMenu" />
         </activity>
+        <activity
+            android:name=".HistoryElementView"
+            android:label="@string/title_activity_history_element_view"
+            android:parentActivityName=".HistoryView" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.hockeytom1.eatingapp.HistoryView" />
+        </activity>
     </application>
 
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
 </manifest>
