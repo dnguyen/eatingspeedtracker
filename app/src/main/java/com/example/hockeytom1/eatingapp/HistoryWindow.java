@@ -1,9 +1,18 @@
 package com.example.hockeytom1.eatingapp;
 
+import android.content.Context;
 import android.database.Cursor;
 
 import com.example.hockeytom1.eatingapp.storage.DatabaseConnection;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -16,26 +25,23 @@ public class HistoryWindow
 
     public HistoryWindow()
     {
-        getRowCount();
+
     }
 
     public void getRowCount()
     {
-        Cursor countCursor;
-        countCursor = DatabaseConnection.getInstance().getDatabase().rawQuery("SELECT * FROM eating_log", null);
-        numberOfRows = countCursor.getCount();
-        countCursor.close();
+
     }
 
     public void populateList()
     {
-        Cursor cursor;
-        cursor = DatabaseConnection.getInstance().getDatabase().rawQuery("SELECT * FROM eating_log", null);
-        if (cursor.moveToLast())
-        {
-            do {
-                //historyList.add(new HistoryElementWindow())
-            } while(cursor.moveToPrevious());
-        }
+        FileInputStream inputStream;
+
+        inputStream = openFileInput("eating_log");
+    }
+
+    public ArrayList<HistoryElementWindow> getHistoryList()
+    {
+        return historyList;
     }
 }

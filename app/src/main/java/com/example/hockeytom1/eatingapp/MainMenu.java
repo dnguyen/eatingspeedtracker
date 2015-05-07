@@ -17,6 +17,9 @@ import com.example.hockeytom1.eatingapp.bluetooth.BluetoothConnection;
 import com.example.hockeytom1.eatingapp.bluetooth.SensorCommand;
 import com.example.hockeytom1.eatingapp.storage.DatabaseConnection;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Date;
 
 import static android.support.v4.app.ActivityCompat.startActivityForResult;
@@ -43,6 +46,7 @@ public class MainMenu extends ActionBarActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
+        File eatingHistory = new File(this.getApplicationContext().getFilesDir(), "eating_log");
 
         btConnection = new BluetoothConnection("HC-06");
         if (btConnection.getAdapter() != null) {
@@ -123,6 +127,7 @@ public class MainMenu extends ActionBarActivity {
             }
 
         });
+
         btConnection.startReading();
     }
 

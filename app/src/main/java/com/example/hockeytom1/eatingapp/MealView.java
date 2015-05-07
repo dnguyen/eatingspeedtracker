@@ -1,5 +1,6 @@
 package com.example.hockeytom1.eatingapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v7.app.ActionBarActivity;
@@ -14,6 +15,11 @@ import android.widget.TextView;
 import com.example.hockeytom1.eatingapp.storage.DBAdapter;
 import com.example.hockeytom1.eatingapp.storage.DatabaseConnection;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 
 
@@ -129,6 +135,19 @@ public class MealView extends ActionBarActivity
     {
         myMealWindow.saveMeal();
 
-        DatabaseConnection.getInstance().getDatabase().execSQL("INSERT INTO eating_log(timeSpentEating, mouthfulsPerMinute, time) VALUES('" + myMealWindow.getTimeSpentEating() + "', '" + myMealWindow.getMouthfulsText() + "', '" + myMealWindow.getTimeStamp() +"')");
+        //HistoryElementWindow sendToHistory = new HistoryElementWindow(myMealWindow.getTimeStamp(), myMealWindow.getTimeSpentEating(), myMealWindow.getMouthfulsText());
+
+        FileOutputStream outputStream;
+        String string = myMealWindow.getTimeStamp()+" "+myMealWindow.getTimeSpentEating()+" "+myMealWindow.getMouthfulsText();
+
+        try{
+            outputStream = openFileOutput("eating_log", Context.MODE_PRIVATE);
+            outputStream.write(string.getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 }
