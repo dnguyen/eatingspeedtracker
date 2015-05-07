@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.hockeytom1.eatingapp.bluetooth.BluetoothConnection;
 import com.example.hockeytom1.eatingapp.bluetooth.SensorCommand;
@@ -135,6 +137,7 @@ public class MealView extends ActionBarActivity
 
     private void startBluetooth() {
         btConnection.findDevice();
+        final Context thisContext = this.getApplicationContext();
         btConnection.setCommandProcessedHandler(new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
@@ -175,6 +178,9 @@ public class MealView extends ActionBarActivity
                         Log.d("acceltest", "User is eating @ " + currentDate.toString() + " time since last ate=" + deltaTime);
                         if (deltaTime <= MIN_EAT_INTERVAL) {
                             Log.d("acceltest", "\tUser is eating too fast");
+                            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                            vibrator.vibrate(3000);
+                            Toast.makeText(thisContext, "Eating too fast!", 3).show();
 
                         }
 
