@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -15,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.TextView;
 
 import com.example.hockeytom1.eatingapp.bluetooth.BluetoothConnection;
@@ -38,9 +40,14 @@ public class MealView extends ActionBarActivity
     private TextView timeSpentEating;
     private TextView mouthfulsPerMinute;
 
+    private Chronometer chronometer;
+    private boolean isPaused = true;
+    private long timeWhenPaused = 0;
+    private int totalMouthfuls = 0;
+    private float avgTimeBetweenMouthfuls = 0;
+    private long timeStarted = 0;
+
     // Bluetooth
-
-
     private final static int REQUEST_ENABLE_BT = 1;
     BluetoothConnection btConnection;
 
@@ -53,7 +60,15 @@ public class MealView extends ActionBarActivity
     final int NO_MOVEMENT = 0;
     final int MOVEMENT_DOWN = -1;
     int prevMovement = NO_MOVEMENT;
+
+    // Minimum time between "bites"
     int MIN_EAT_INTERVAL = 5000;
+    // Minimum value of Flex sensor 0
+    int MIN_FLEX0_VALUE = 250;
+    // Max value of Flex sensor 0
+    int MAX_FLEX0_VALUE = 320;
+    // Max value of Flex sensor 1
+    int MAX_FLEX1_VALUE = 420;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -62,6 +77,22 @@ public class MealView extends ActionBarActivity
         Intent intent = getIntent();
         setContentView(R.layout.activity_meal_view);
 
+        chronometer = (Chronometer) findViewById(R.id.chronometer);
+        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+
+                long timeElapsed = SystemClock.elapsedRealtime() - chronometer.getBase();
+                int hours = (int) (timeElapsed / 3600000);
+                int minutes = (int) Math.ceil((timeElapsed - hours * 3600000) / 60000);
+                if (minutes == 0) {
+                    minutes = 1;
+                }
+                double mouthfuls = totalMouthfuls / minutes;
+                Log.d("eatinglog", "mouthfuls: " + mouthfuls);
+                mouthfulsPerMinute.setText(Double.toString(mouthfuls));
+            }
+        });
         startStopButtonText = (Button) findViewById(R.id.start_button_id);
         timeSpentEating = (TextView) findViewById(R.id.time_spent_eating);
         mouthfulsPerMinute = (TextView) findViewById(R.id.mouthfuls_per_minute);
@@ -140,11 +171,14 @@ public class MealView extends ActionBarActivity
                 long deltaTime = currentTime - lastEatTime;
                 if (prevMovement == MOVEMENT_DOWN && currMovement == NO_MOVEMENT && deltaTime >= 2000) {
                     // Also check flex sensor data to see if they are within eating threshold
-                    if ((command.getFlex(0).getValue() >= 250 && command.getFlex(0).getValue() <= 320) && command.getFlex(1).getValue() <= 420) {
+                    if ((command.getFlex(0).getValue() >= MIN_FLEX0_VALUE && command.getFlex(0).getValue() <= MAX_FLEX0_VALUE) && command.getFlex(1).getValue() <= MAX_FLEX1_VALUE) {
                         Log.d("acceltest", "User is eating @ " + currentDate.toString() + " time since last ate=" + deltaTime);
                         if (deltaTime <= MIN_EAT_INTERVAL) {
                             Log.d("acceltest", "\tUser is eating too fast");
+
                         }
+
+                        totalMouthfuls++;
                         lastEatTime = currentTime;
                     }
                 }
@@ -186,38 +220,19 @@ public class MealView extends ActionBarActivity
 
     public void startStopButton(View view)
     {
-        if(myMealWindow.getIsPaused() == true)
-        {
-            //myMealWindow.setIsPaused(false);
-            //myMealWindow.setStartStopButton("Stop");
-            myMealWindow.startMeal();
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while(!myMealWindow.getIsPaused())
-                    {
-                        myMealWindow.timeMeal();
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Resources res = getResources();
-                                String timeSpentEatingText = res.getString(R.string.time_spent_eating, myMealWindow.getTimeSpentEating());
-                                String mouthfulsPerMinuteText = res.getString(R.string.mouthfuls_per_minute, myMealWindow.getMouthfulsText());
-
-                                timeSpentEating.setText(timeSpentEatingText);
-                                mouthfulsPerMinute.setText(mouthfulsPerMinuteText);
-                            }
-                        });
-                    }
-                }
-            }).start();
-        }
-        else
-        {
+        if (this.isPaused) {
+            this.isPaused = false;
+            chronometer.setBase(SystemClock.elapsedRealtime() + timeWhenPaused);
+            chronometer.start();
+            myMealWindow.setStartStopButton("Stop");
+        } else {
             myMealWindow.pauseMeal();
+            this.isPaused = true;
+            timeWhenPaused = chronometer.getBase() - SystemClock.elapsedRealtime();
+            chronometer.stop();
         }
+
         Resources res = getResources();
         String buttonText = res.getString(R.string.start_stop_button, myMealWindow.getStartStopButton());
 
@@ -235,6 +250,8 @@ public class MealView extends ActionBarActivity
         timeSpentEating.setText(timeSpentEatingText);
         mouthfulsPerMinute.setText(mouthfulsPerMinuteText);
         startStopButtonText.setText(buttonText);
+        chronometer.setBase(SystemClock.elapsedRealtime());
+        timeWhenPaused = 0;
     }
 
     public void saveButton(View view)
