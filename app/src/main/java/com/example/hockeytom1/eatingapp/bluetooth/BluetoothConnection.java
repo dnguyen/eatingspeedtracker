@@ -3,12 +3,15 @@ package com.example.hockeytom1.eatingapp.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.ParcelUuid;
 import android.util.Log;
 
 import java.util.Set;
 import java.util.UUID;
+
+import static android.support.v4.app.ActivityCompat.startActivityForResult;
 
 public class BluetoothConnection {
 
@@ -24,7 +27,6 @@ public class BluetoothConnection {
     public BluetoothConnection(String deviceName) {
         this.deviceName = deviceName;
         initAdapter();
-        findDevice();
     }
 
     public boolean initAdapter() {
@@ -53,7 +55,7 @@ public class BluetoothConnection {
         this.adapter = adapter;
     }
 
-    private void findDevice() {
+    public void findDevice() {
         Set<BluetoothDevice> pairedDevices = adapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {

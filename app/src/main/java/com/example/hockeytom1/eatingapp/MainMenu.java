@@ -1,5 +1,6 @@
 package com.example.hockeytom1.eatingapp;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Handler;
@@ -18,8 +19,13 @@ import com.example.hockeytom1.eatingapp.storage.DatabaseConnection;
 
 import java.util.Date;
 
+import static android.support.v4.app.ActivityCompat.startActivityForResult;
+
 
 public class MainMenu extends ActionBarActivity {
+
+    private final static int REQUEST_ENABLE_BT = 1;
+    BluetoothConnection btConnection;
 
     float prevZ = 0;
     float currentZ = 0;
@@ -38,27 +44,45 @@ public class MainMenu extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        BluetoothConnection newConnection = new BluetoothConnection("HC-06");
-        newConnection.setCommandProcessedHandler(new Handler(Looper.getMainLooper()) {
+        btConnection = new BluetoothConnection("HC-06");
+        if (btConnection.getAdapter() != null) {
+
+            // Check if bluetooth is enabled, if not ask user to enable it.
+            if (!btConnection.getAdapter().isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            } else {
+                startBluetooth();
+            }
+
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check if we're responding to enable bluetooth dialog
+        if (requestCode == REQUEST_ENABLE_BT) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                startBluetooth();
+            }
+        }
+    }
+
+    private void startBluetooth() {
+        btConnection.findDevice();
+        btConnection.setCommandProcessedHandler(new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
                 SensorCommand command = (SensorCommand) msg.obj;
-                //Log.d("eatingapp", "Received: " + command.Command + " " + command.Time + " (" + command.TimeMS + ")");
-                /*Log.d(
-                        "eatingapp",
-                        "\t acceleration: " +
-                                command.getAcceleration().getX() + "," +
-                                command.getAcceleration().getY() + "," +
-                                command.getAcceleration().getZ()
-                );
-                Log.d("eatingapp", "\t f0: " + command.getFlex(0) + " f1: " + command.getFlex(1));*/
 
                 // apply a low pass filter to remove/zero force of gravity
                 final float alpha = 0.25f;
                 gravZ = gravZ + alpha * (command.getAcceleration().getZ() - gravZ);
                 currentZ = command.getAcceleration().getZ() - gravZ;
                 deltaZ = prevZ - currentZ;
-                //Log.d("acceltest", "oa=" + event.values[2] + " a="+ currentZ + " delta=" + deltaZ);
+
                 // Calculate change in Z acceleration using the previous Z acceleration.
                 // If the change is positive => hand is decelerating/"moving down"
                 // If the change is negative => hand is accelerating/"moving up"
@@ -99,9 +123,9 @@ public class MainMenu extends ActionBarActivity {
             }
 
         });
-        newConnection.startReading();
-
+        btConnection.startReading();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
