@@ -16,71 +16,92 @@ import com.example.hockeytom1.eatingapp.bluetooth.BluetoothConnection;
 import com.example.hockeytom1.eatingapp.bluetooth.SensorCommand;
 import com.example.hockeytom1.eatingapp.storage.DatabaseConnection;
 
+import java.util.Date;
+
 
 public class MainMenu extends ActionBarActivity {
 
+    float prevZ = 0;
+    float currentZ = 0;
+    float deltaZ = 0;
+    float gravZ = 1;
+    long lastEatTime = 0;
+    final int MOVEMENT_UP = 1;
+    final int NO_MOVEMENT = 0;
+    final int MOVEMENT_DOWN = -1;
+    int prevMovement = NO_MOVEMENT;
+    int MIN_EAT_INTERVAL = 5000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-/*
+
         BluetoothConnection newConnection = new BluetoothConnection("HC-06");
         newConnection.setCommandProcessedHandler(new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
                 SensorCommand command = (SensorCommand) msg.obj;
-                Log.d("eatingapp", "Received: " + command.Command + " " + command.Time + " (" + command.TimeMS + ")");
-                Log.d(
+                //Log.d("eatingapp", "Received: " + command.Command + " " + command.Time + " (" + command.TimeMS + ")");
+                /*Log.d(
                         "eatingapp",
                         "\t acceleration: " +
                                 command.getAcceleration().getX() + "," +
                                 command.getAcceleration().getY() + "," +
                                 command.getAcceleration().getZ()
                 );
-                Log.d("eatingapp", "\t f0: " + command.getFlex(0) + " f1: " + command.getFlex(1));
+                Log.d("eatingapp", "\t f0: " + command.getFlex(0) + " f1: " + command.getFlex(1));*/
 
-                // Store last 10 commands in a queue so we can look at sensor data from the past second
-                // When queue size reaches 10 pop oldest command, and push new command onto the queue
-                // Look at each command in the queue
-                // Calc max min acceleration of x, y, and z directions
-                // Calc max min flex of all flex sensors
-                // If the difference between the maxes and mins is small
-                //      -> No change in movement in the last second -> not eating?
-                // Else if the difference is large
-                //      -> Inspect the data further, as it's possible the user ate in the past second
-                //          Determining if the user ate in the past second:
-                //
-                //          Look at Z acceleration (Az) for each command (Z acceleration is up/down movement)
-                //          If Az had a large increase from 9.8m/s^2 (9.8=no up/down movement) over the past second
-                //              AND decreased back to 9.8 during the later part of the second
-                //                  -> User moved hand and abruptly stopped moving their hand
-                //                     This could mean that the user either put their hand to their mouth
-                //                     or the user moved their hand from their mouth to their "plate"
-                //                     We also know that if Az decreases then the hand is moving up. (Eg 9.8 -> 0 would mean
-                //                          that hand moved up at 9.8ms2)
-                //                     If this is the case, we can look at flex sensor data and if the flex sensors
-                //                     are within the "eating" flex threshold, we can imply that the user ate within
-                //                     the past second (?). We then log the current time as "is eating" in the database.
-                //
-                //                     If the difference between the last eat time and current time is smaller than some
-                //                          threshold -> user is eating too fast
-                //
-                //                     Set lastEatTime = current time
-                //          If Az did NOT have a large increase, but was also NOT constant then this implies that the user
-                //              is in the middle of a movement. We can ignore this?
-                //          If Az remained constant (9.6-10.2?) implies no movement -> can definitely ignore this.
+                // apply a low pass filter to remove/zero force of gravity
+                final float alpha = 0.25f;
+                gravZ = gravZ + alpha * (command.getAcceleration().getZ() - gravZ);
+                currentZ = command.getAcceleration().getZ() - gravZ;
+                deltaZ = prevZ - currentZ;
+                //Log.d("acceltest", "oa=" + event.values[2] + " a="+ currentZ + " delta=" + deltaZ);
+                // Calculate change in Z acceleration using the previous Z acceleration.
+                // If the change is positive => hand is decelerating/"moving down"
+                // If the change is negative => hand is accelerating/"moving up"
+                // If no change (-1.0 to 1.0) => hand is not moving at all
+                int currMovement = NO_MOVEMENT;
+                if (deltaZ <= -0.75) {
+                    currMovement = MOVEMENT_UP;
+                } else if (deltaZ >= 0.75) {
+                    currMovement = MOVEMENT_DOWN;
+                }
 
-//                if (command.Command.equals("a")) {
-//                    String[] data = command.Data.split(",");
-//                    DatabaseConnection.getInstance().getDatabase().execSQL("INSERT INTO acceleration_log (x, y, z, time) VALUES(" + data[0] + "," + data[1] + "," + data[2] + ");");
-//                }
+                //Log.d("eatingapp", "deltaZ=" + deltaZ + " currentZ=" + currentZ + " prevMovement: " + prevMovement + " currMovement: " + currMovement);
+                // If the previous recording recorded a up down movement and the current movement is no movement
+                // then we can assume the user moved their hand to their plate and did not move their hand
+                // Thus we can infer that the user ate something in this time period. We make sure the difference between
+                // the current time and the time they last ate is greater than 2 second because the sensor
+                // will pick up slight up/down movements when coming to a stop (acceleration increases, and
+                // quickly decreases); so we can assume that if the sensor records a down -> no movement in
+                // less than 2 seconds, it was caused by the sensor picking up a slight movement and we don't
+                // count this as eating
+                Date currentDate = new Date();
+                long currentTime = currentDate.getTime();
+                long deltaTime = currentTime - lastEatTime;
+                if (prevMovement == MOVEMENT_DOWN && currMovement == NO_MOVEMENT && deltaTime >= 2000) {
+                    // Also check flex sensor data to see if they are within eating threshold
+                    if ((command.getFlex(0).getValue() >= 250 && command.getFlex(0).getValue() <= 320) && command.getFlex(1).getValue() <= 420) {
+                        Log.d("acceltest", "User is eating @ " + currentDate.toString() + " time since last ate=" + deltaTime);
+                        if (deltaTime <= MIN_EAT_INTERVAL) {
+                            Log.d("acceltest", "\tUser is eating too fast");
+                        }
+                        lastEatTime = currentTime;
+                    }
+                }
+
+                prevMovement = currMovement;
+                prevZ = currentZ;
+
             }
 
         });
         newConnection.startReading();
-        */
-    }
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

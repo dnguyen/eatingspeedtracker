@@ -54,10 +54,13 @@ public class ConnectedThread extends Thread {
                     if (currentChar == '\n') {
                         // If an event handler is given, send the handler a SensorCommand object containing the current command
                         if (this.commandProcessedHandler != null) {
-                            Log.d("eatingapp", "Found handler, sending message");
-                            SensorCommand sensorCommand = new SensorCommand(currentCommand);
-                            Message msg = this.commandProcessedHandler.obtainMessage(1, sensorCommand);
-                            this.commandProcessedHandler.sendMessage(msg);
+                            //Log.d("eatingapp", "Found handler, sending message");
+                            if (currentCommand.charAt(0) == 'a') {
+                                SensorCommand sensorCommand = new SensorCommand(currentCommand);
+
+                                Message msg = this.commandProcessedHandler.obtainMessage(1, sensorCommand);
+                                this.commandProcessedHandler.sendMessage(msg);
+                            }
                         } else {
                             Log.d("eatingapp", "Could not find handler");
                         }

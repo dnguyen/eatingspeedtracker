@@ -25,20 +25,20 @@ public class HistoryView extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         setContentView(R.layout.activity_history_view);
+//
+//        Cursor cursor = DatabaseConnection.getInstance().getDatabase().query("eating_log", new String[] {"time_stamp"}, null, null, null, null, null);
+//        cursor.moveToLast();
+//
+//        String[] listOfDates = {"time_stamp"};
+//        int[] to = {android.R.id.text1};
+//
+//        ListAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, cursor, listOfDates, to);
+//
+//        historyListView = (ListView)findViewById(R.id.history_list_view);
+//
+//        historyListView.setAdapter(adapter);
 
-        Cursor cursor = DatabaseConnection.getInstance().getDatabase().query("eating_log", new String[] {"time_stamp"}, null, null, null, null, null);
-        cursor.moveToLast();
-
-        String[] listOfDates = {"time_stamp"};
-        int[] to = {android.R.id.text1};
-
-        ListAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, cursor, listOfDates, to);
-
-        historyListView = (ListView)findViewById(R.id.history_list_view);
-
-        historyListView.setAdapter(adapter);
-
-        cursor.close();
+        //cursor.close();
     }
 
     @Override

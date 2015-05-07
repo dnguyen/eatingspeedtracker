@@ -2,6 +2,7 @@ package com.example.hockeytom1.eatingapp.bluetooth;
 
 import android.util.Log;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -38,20 +39,25 @@ public class SensorCommand {
         this.Time = parsedDate;
         this.TimeMS = currentTime.getTime();
         this.flexSensors = new FlexSensor[5];
-
+        Log.d("eatingapp", "raw command: " + this.Command);
         // Parse all sensors from raw command string
         String[] commands = rawCommand.split(";");
 
         for (String command : commands) {
+            //Log.d("eatingapp", command);
             String[] commandSplit = command.split(":");
             String sensor = commandSplit[0];
             String data = commandSplit[1].replaceAll("\\s", "");
 
             // Accelerometer data contains multiple values
-            if (sensor.equals("a")) {
+            if (sensor.equals("a") || sensor.equals("")) {
                 String[] accelData = data.split(",");
+                String x = (accelData[0].length() > 0) ? accelData[0] : "0";
+                String y = (accelData[1].length() > 0) ? accelData[1] : "0";
+                String z = (accelData[2].length() > 0) ? accelData[2] : "0";
+
                 this.acceleration = new AccelerometerSensor(
-                        Float.parseFloat(accelData[0]), Float.parseFloat(accelData[1]), Float.parseFloat(accelData[2])
+                        Float.parseFloat(x), Float.parseFloat(y), Float.parseFloat(z)
                 );
             } else if (sensor.charAt(0) == 'f') {
                 // All flex sensors are labeled f#:value
