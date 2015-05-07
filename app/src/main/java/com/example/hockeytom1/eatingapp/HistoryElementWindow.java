@@ -9,7 +9,6 @@ public class HistoryElementWindow
     private String timeSpentEating;
     private String mouthfulsText;
 
-    //Constructor should accept database element as parameter and then assign the values accordingly
     public HistoryElementWindow(String dbTimeStamp, String dbTimeSpentEating, String dbMouthfulsText)
     {
         timeStamp = dbTimeStamp;

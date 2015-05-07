@@ -91,7 +91,7 @@ public class MealView extends ActionBarActivity
                     minutes = 1;
                 }
                 double mouthfuls = totalMouthfuls / minutes;
-                Log.d("eatinglog", "mouthfuls: " + mouthfuls);
+                Log.d("eatinglog", "total: "+ totalMouthfuls + " " + "mouthfuls: " + mouthfuls);
                 mouthfulsPerMinute.setText(Double.toString(mouthfuls));
             }
         });
@@ -180,7 +180,7 @@ public class MealView extends ActionBarActivity
                             Log.d("acceltest", "\tUser is eating too fast");
                             Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
                             vibrator.vibrate(3000);
-                            Toast.makeText(thisContext, "Eating too fast!", 3).show();
+                            Toast.makeText(thisContext, "Eating too fast!", Toast.LENGTH_SHORT).show();
 
                         }
 
@@ -267,10 +267,11 @@ public class MealView extends ActionBarActivity
         //HistoryElementWindow sendToHistory = new HistoryElementWindow(myMealWindow.getTimeStamp(), myMealWindow.getTimeSpentEating(), myMealWindow.getMouthfulsText());
 
         FileOutputStream outputStream;
-        String string = myMealWindow.getTimeStamp()+" "+myMealWindow.getTimeSpentEating()+" "+myMealWindow.getMouthfulsText();
+        System.out.println(chronometer.getText().toString());
+        String string = myMealWindow.getTimeStamp()+" "+chronometer.getText().toString()+" "+mouthfulsPerMinute.getText()+"\n";
 
         try{
-            outputStream = openFileOutput("eating_log", Context.MODE_PRIVATE);
+            outputStream = openFileOutput("eating_log", Context.MODE_APPEND);
             outputStream.write(string.getBytes());
             outputStream.close();
         } catch (Exception e) {

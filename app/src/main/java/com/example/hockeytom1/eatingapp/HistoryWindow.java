@@ -20,7 +20,7 @@ import java.util.ArrayList;
  */
 public class HistoryWindow
 {
-    private ArrayList<HistoryElementWindow> historyList;
+    //private ArrayList<HistoryElementWindow> historyList;
     int numberOfRows;
 
     public HistoryWindow()
@@ -35,13 +35,12 @@ public class HistoryWindow
 
     public void populateList()
     {
-        FileInputStream inputStream;
 
-        inputStream = openFileInput("eating_log");
     }
-
+/*
     public ArrayList<HistoryElementWindow> getHistoryList()
     {
         return historyList;
     }
+    */
 }
